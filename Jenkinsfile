@@ -12,13 +12,14 @@ pipeline{
                 }
         }
         
-        stage("sonar quality check"){
+        stage('sonar quality check'){
             agent {
                 docker {
                     image 'openjdk:11'
                 }
             }
-             stage('docker build image'){
+        } 
+        stage('docker build image'){
             steps{
                 script{
                     sh 'docker build -t 192.168.1.70:8083/springapp:${BUILD_ID} .'
@@ -45,5 +46,5 @@ pipeline{
 
 
 
-                }
+                
             
