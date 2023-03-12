@@ -1,4 +1,5 @@
 pipeline{
+
     agent any 
     stages{
            
@@ -13,31 +14,25 @@ pipeline{
         }
         
         
-        stage('docker build image'){
+        stage("sonar quality check"){
+            agent {
+                docker {
+                    image 'openjdk:11'
+                }
+            }
             steps{
                 script{
-                    sh 'docker build -t 192.168.1.70:8083/springapp:${BUILD_ID} .'
+                  withSonarQubeEnv(credentialsId: 'sonar_qube') {
+
+                            sh 'chmod +x gradlew'
+                            sh './gradlew sonarqube'
+                    }
+                                                }
 
                 }
             }
         }
-              stage('docker image push nexus'){
-            steps{
-                script{
-                     withCredentials([string(credentialsId: 'nexus-token', variable: 'nexus_creds')]) {
-                        sh "docker login -u admin -p $nexus_creds 192.168.1.70:8083"
-                        sh 'docker push 192.168.1.70:8083/springapp:${BUILD_ID}'
-                        sh 'docker rmi 192.168.1.70:8083/springapp:${BUILD_ID}'
-                         sh   'docker image prune -f'  
-
-                }
-          
-                  }
-                    }
-        }
-              }
-           }
-
+    }        
 
 
                 
